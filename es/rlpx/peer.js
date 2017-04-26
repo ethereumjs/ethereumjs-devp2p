@@ -77,7 +77,7 @@ class Peer extends EventEmitter {
     this._protocols = []
 
     // send AUTH if outgoing connection
-    if (this._remoteId !== null) this._sendAuth()
+    if (this._remoteId) this._sendAuth()
   }
 
   static DISCONNECT_REASONS = {
@@ -170,7 +170,7 @@ class Peer extends EventEmitter {
           id: payload[4]
         }
 
-        if (this._remoteId === null) {
+        if (!this._remoteId) {
           this._remoteId = Buffer.from(this._hello.id)
         } else if (!this._remoteId.equals(this._hello.id)) {
           return this.disconnect(Peer.DISCONNECT_REASONS.INVALID_IDENTITY)
