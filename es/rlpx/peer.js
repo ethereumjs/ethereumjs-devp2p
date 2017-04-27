@@ -80,22 +80,6 @@ class Peer extends EventEmitter {
     if (this._remoteId) this._sendAuth()
   }
 
-  static DISCONNECT_REASONS = {
-    DISCONNECT_REQUESTED: 0x00,
-    NETWORK_ERROR: 0x01,
-    PROTOCOL_ERROR: 0x02,
-    USELESS_PEER: 0x03,
-    TOO_MANY_PEERS: 0x04,
-    ALREADY_CONNECTED: 0x05,
-    INCOMPATIBLE_VERSION: 0x06,
-    INVALID_IDENTITY: 0x07,
-    CLIENT_QUITTING: 0x08,
-    UNEXPECTED_IDENTITY: 0x09,
-    SAME_IDENTITY: 0x0a,
-    TIMEOUT: 0x0b,
-    SUBPROTOCOL_ERROR: 0x10
-  }
-
   _parsePacket (data) {
     switch (this._state) {
       case 'Auth':
@@ -305,4 +289,19 @@ class Peer extends EventEmitter {
   }
 }
 
+Peer.DISCONNECT_REASONS = {
+  DISCONNECT_REQUESTED: 0x00,
+  NETWORK_ERROR: 0x01,
+  PROTOCOL_ERROR: 0x02,
+  USELESS_PEER: 0x03,
+  TOO_MANY_PEERS: 0x04,
+  ALREADY_CONNECTED: 0x05,
+  INCOMPATIBLE_VERSION: 0x06,
+  INVALID_IDENTITY: 0x07,
+  CLIENT_QUITTING: 0x08,
+  UNEXPECTED_IDENTITY: 0x09,
+  SAME_IDENTITY: 0x0a,
+  TIMEOUT: 0x0b,
+  SUBPROTOCOL_ERROR: 0x10
+}
 module.exports = Peer
