@@ -37,11 +37,6 @@ class ETH extends EventEmitter {
     }, ms('5s'))
   }
 
-  static eth62 = { name: 'eth', version: 62, length: 8, constructor: ETH }
-  static eth63 = { name: 'eth', version: 63, length: 17, constructor: ETH }
-
-  static MESSAGE_CODES = MESSAGE_CODES
-
   _handleMessage (code, data) {
     const payload = rlp.decode(data)
     switch (code) {
@@ -138,5 +133,10 @@ class ETH extends EventEmitter {
     this._send(code, rlp.encode(payload))
   }
 }
+
+ETH.eth62 = { name: 'eth', version: 62, length: 8, constructor: ETH }
+ETH.eth63 = { name: 'eth', version: 63, length: 17, constructor: ETH }
+
+ETH.MESSAGE_CODES = MESSAGE_CODES
 
 module.exports = ETH
