@@ -53,8 +53,6 @@ class RLPx extends EventEmitter {
     this._refillIntervalId = setInterval(() => this._refillConnections(), ms('10s'))
   }
 
-  static DISCONNECT_REASONS = Peer.DISCONNECT_REASONS
-
   listen (...args) {
     this._isAliveCheck()
     debug('call .listen')
@@ -209,5 +207,5 @@ class RLPx extends EventEmitter {
     })
   }
 }
-
+RLPx.DISCONNECT_REASONS = Peer.DISCONNECT_REASONS
 module.exports = RLPx
