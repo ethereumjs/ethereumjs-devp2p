@@ -1,0 +1,56 @@
+[
+  {
+    "ip": "163.172.131.191",
+    "port": "30303",
+    "id": "6a868ced2dec399c53f730261173638a93a40214cf299ccf4d42a76e3fa54701db410669e8006347a4b3a74fa090bb35af0320e4bc8d04cf5b7f582b1db285f5",
+    "network": "Mainnet",
+    "chainId": 1,
+    "location": "Node1",
+    "comment": "Parity Bootnode"
+  },
+  {
+    "ip": "212.47.247.103",
+    "port": "30303",
+    "id": "66a483383882a518fcc59db6c017f9cd13c71261f13c8d7e67ed43adbbc82a932d88d2291f59be577e9425181fc08828dc916fdd053af935a9491edf9d6006ba",
+    "network": "Mainnet",
+    "chainId": 1,
+    "location": "Node2",
+    "comment": "Parity Bootnode"
+  },
+  {
+    "ip": "163.172.157.114",
+    "port": "30303",
+    "id": "cd6611461840543d5b9c56fbf088736154c699c43973b3a1a32390cf27106f87e58a818a606ccb05f3866de95a4fe860786fea71bf891ea95f234480d3022aa3",
+    "network": "Mainnet",
+    "chainId": 1,
+    "location": "Node3",
+    "comment": "Parity Bootnode"
+  },
+  {
+    "ip": "52.233.198.218",
+    "port": "30303",
+    "id": "78b094cb27ceeecbe311bc278f4fde8b9a265db42d268c88484c94d7a2d19b82a1bd22dfd6c2bd4d90f9b05e6d42255e6eb85de15f73848ff82ed0be9cdf5202",
+    "network": "Mainnet",
+    "chainId": 1,
+    "location": "Node4",
+    "comment": "Parity Bootnode"
+  },
+  {
+    "ip": "40.65.122.44",
+    "port": "30303",
+    "id": "00526537cb7e1aa6cf49714f0635fd0f608904d8d0693b949eea2dcdfdb0abbe4c794003a5fe57aa662d0a9215e8dfa4d2deb6ef0101c5e185e2617721813d43",
+    "network": "Mainnet",
+    "chainId": 1,
+    "location": "Node5",
+    "comment": "Parity Bootnode"
+  },
+  {
+    "ip": "40.71.6.49",
+    "port": "3030",
+    "id": "4a456b4b6e6ee1f51389763e51b80fe04782c762445d96c32a96ebd34bd9178c1894924d5101123eacfd4f0fc4da25b5e1ee7f18832ac0bf4c6d6ac81442d698",
+    "network": "Mainnet",
+    "chainId": 1,
+    "location": "Node6",
+    "comment": "Parity Bootnode"
+  }
+]

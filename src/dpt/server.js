@@ -73,7 +73,7 @@ class Server extends EventEmitter {
         if (this._requests.get(rkey) !== undefined) {
           debug(`ping timeout: ${peer.address}:${peer.udpPort} ${peer.id && peer.id.toString('hex')}`)
           this._requests.delete(rkey)
-          deferred.reject(new Error(`Timeout error: ping ${peer.address}:${peer.udpPort}`))
+          // deferred.reject(new Error(`Timeout error: ping ${peer.address}:${peer.udpPort}`))
         } else {
           return deferred.promise
         }
@@ -139,6 +139,7 @@ class Server extends EventEmitter {
         break
 
       case 'findneighbours':
+        //console.log("$$$$$$$$$$$$$$$$$$$ findneighbours")
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
         this._send(rinfo, 'neighbours', {
           peers: this._dpt.getClosestPeers(info.data.id)

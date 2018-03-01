@@ -24,6 +24,8 @@ const address = {
   encode: function (value) {
     if (ip.isV4Format(value)) return ip.toBuffer(value)
     if (ip.isV6Format(value)) return ip.toBuffer(value)
+    //console.log(`Invalid address value: ${value}`)
+    console.log(value);
     throw new Error(`Invalid address: ${value}`)
   },
   decode: function (buffer) {

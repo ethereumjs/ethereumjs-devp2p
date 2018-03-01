@@ -1,3 +1,8 @@
+// run it:
+// npm install
+// node -r babel-register ./examples/peer-communication.js
+
+
 const devp2p = require('../src')
 const EthereumTx = require('ethereumjs-tx')
 const EthereumBlock = require('ethereumjs-block')
@@ -12,7 +17,9 @@ const Buffer = require('safe-buffer').Buffer
 const PRIVATE_KEY = randomBytes(32)
 const CHAIN_ID = 1
 
-const BOOTNODES = require('ethereum-common').bootstrapNodes.filter((node) => {
+
+const BOOTNODES = require('./bootstrapNodes.json').filter((node) => {
+
   return node.chainId === CHAIN_ID
 }).map((node) => {
   return {
@@ -21,7 +28,10 @@ const BOOTNODES = require('ethereum-common').bootstrapNodes.filter((node) => {
     tcpPort: node.port
   }
 })
-const REMOTE_CLIENTID_FILTER = ['go1.5', 'go1.6', 'go1.7', 'quorum', 'pirl', 'ubiq', 'gmc', 'gwhale', 'prichain']
+const REMOTE_CLIENTID_FILTER = ['go1.5', 'parity', 'rustc1.23.0', 'go1.6', 'go1.7', 'quorum', 'pirl', 'ubiq', 'gmc', 'gwhale', 'prichain']
+
+//Parity//v1.8.9-stable-1952d05-20180201/x86_64-linux-gnu/rustc1.23.0
+
 
 const CHECK_BLOCK_TITLE = 'Byzantium Fork' // Only for debugging/console output
 const CHECK_BLOCK_NR = 4370000
@@ -50,7 +60,7 @@ const rlpx = new devp2p.RLPx(PRIVATE_KEY, {
     devp2p.ETH.eth63,
     devp2p.ETH.eth62
   ],
-  remoteClientIdFilter: REMOTE_CLIENTID_FILTER,
+  //remoteClientIdFilter: REMOTE_CLIENTID_FILTER,
   listenPort: null
 })
 
@@ -62,6 +72,8 @@ rlpx.on('peer:added', (peer) => {
   const requests = { headers: [], bodies: [], msgTypes: {} }
 
   const clientId = peer.getHelloMessage().clientId
+
+
   console.log(chalk.green(`Add peer: ${addr} ${clientId} (eth${eth.getVersion()}) (total: ${rlpx.getPeers().length})`))
 
   eth.sendStatus({
@@ -138,7 +150,7 @@ rlpx.on('peer:added', (peer) => {
           const expectedHash = CHECK_BLOCK
           const header = new EthereumBlock.Header(payload[0])
           if (header.hash().toString('hex') === expectedHash) {
-            console.log(`${addr} verified to be on the same side of the ${CHECK_BLOCK_TITLE}`)
+            //console.log(`${addr} verified to be on the same side of the ${CHECK_BLOCK_TITLE}`)
             clearTimeout(forkDrop)
             forkVerified = true
           }
@@ -258,8 +270,8 @@ rlpx.on('peer:error', (peer, err) => {
 })
 
 // uncomment, if you want accept incoming connections
-// rlpx.listen(30303, '0.0.0.0')
-// dpt.bind(30303, '0.0.0.0')
+rlpx.listen(30303, '0.0.0.0')
+dpt.bind(30303, '0.0.0.0')
 
 for (let bootnode of BOOTNODES) {
   dpt.bootstrap(bootnode).catch((err) => {
@@ -279,6 +291,7 @@ dpt.addPeer({ address: '127.0.0.1', udpPort: 30303, tcpPort: 30303 })
   })
   .catch((err) => console.log(`error on connection to local node: ${err.stack || err}`))
 */
+let printLessNewTxs = 1;
 
 const txCache = new LRUCache({ max: 1000 })
 function onNewTx (tx, peer) {
@@ -286,7 +299,11 @@ function onNewTx (tx, peer) {
   if (txCache.has(txHashHex)) return
 
   txCache.set(txHashHex, true)
+  printLessNewTxs++;
+
+  if(printLessNewTxs % 10 == 1){
   console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
+}
 }
 
 const blocksCache = new LRUCache({ max: 100 })
