@@ -122,7 +122,7 @@ const findneighbours = {
 const neighbours = {
   encode: function (obj) {
     return [
-      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
+      obj.peers.map((peer) => endpoint.encode(peer.endpoint).concat(peer.id)),
       timestamp.encode(obj.timestamp)
     ]
   },
