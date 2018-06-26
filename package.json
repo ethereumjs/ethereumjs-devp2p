@@ -1,6 +1,6 @@
 {
   "name": "ethereumjs-devp2p",
-  "version": "2.3.0",
+  "version": "2.5.0",
   "description": "A JavaScript implementation of ÐΞVp2p",
   "keywords": [
     "ethereum",
@@ -10,7 +10,9 @@
     "rlpx",
     "eth",
     "eth62",
-    "eth63"
+    "eth63",
+    "les",
+    "les2"
   ],
   "homepage": "https://github.com/fanatid/ethereumjs-devp2p",
   "bugs": {
