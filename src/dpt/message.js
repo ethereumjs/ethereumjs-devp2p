@@ -76,8 +76,17 @@ const ping = {
       int2buffer(obj.version),
       endpoint.encode(obj.from),
       endpoint.encode(obj.to),
-      timestamp.encode(obj.timestamp)
+      timestamp.encode(obj.timestamp),
+      [topic]
     ]
+
+
+    // message = _pack(CMD_PING.id, payload, self.privkey)
+    // self.send(node, message)
+    // # Return the msg hash, which is used as a token to identify pongs.
+    //   return message[:MAC_SIZE]
+    
+    
   },
   decode: function (payload) {
     return {
@@ -138,20 +147,59 @@ const neighbours = {
   }
 }
 
-const messages = { ping, pong, findneighbours, neighbours }
+// Node discovery v5
+const topicquery = {
+  encode: function (obj) {
+    return [
+      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
+      timestamp.encode(obj.timestamp)
+    ]
+  },
+  decode: function (payload) {
+    return {
+      peers: payload[0].map((data) => {
+        return { endpoint: endpoint.decode(data), id: data[3] }
+      }),
+      timestamp: timestamp.decode(payload[1])
+    }
+  }
+}
+
+const topicnodes = {
+  encode: function (obj) {
+    return [
+      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
+      timestamp.encode(obj.timestamp)
+    ]
+  },
+  decode: function (payload) {
+    return {
+      peers: payload[0].map((data) => {
+        return { endpoint: endpoint.decode(data), id: data[3] }
+      }),
+      timestamp: timestamp.decode(payload[1])
+    }
+  }
+}
+
+const messages = { ping, pong, findneighbours, neighbours, topicquery, topicnodes }
 
 const types = {
   byName: {
     ping: 0x01,
     pong: 0x02,
     findneighbours: 0x03,
-    neighbours: 0x04
+    neighbours: 0x04,
+    topicquery: 0x05,
+    topicnodes: 0x06
   },
   byType: {
     0x01: 'ping',
     0x02: 'pong',
     0x03: 'findneighbours',
-    0x04: 'neighbours'
+    0x04: 'neighbours',
+    0x05: 'topicquery',
+    0x06: 'topicnodes'
   }
 }
 

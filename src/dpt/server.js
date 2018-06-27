@@ -7,7 +7,7 @@ const message = require('./message')
 const { keccak256, pk2id, createDeferred } = require('../util')
 
 const debug = createDebugLogger('devp2p:dpt:server')
-const VERSION = 0x04
+const VERSION = 0x05
 const createSocketUDP4 = dgram.createSocket.bind(null, 'udp4')
 
 class Server extends EventEmitter {
@@ -159,7 +159,6 @@ class Server extends EventEmitter {
         break
 
       case 'findneighbours':
-        //console.log("$$$$$$$$$$$$$$$$$$$ findneighbours")
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
         this._send(rinfo, 'neighbours', {
           peers: this._dpt.getClosestPeers(info.data.id)
