@@ -77,7 +77,6 @@ const ping = {
       endpoint.encode(obj.from),
       endpoint.encode(obj.to),
       timestamp.encode(obj.timestamp),
-      [topic]
     ]
 
 

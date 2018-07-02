@@ -28,6 +28,7 @@ class DPT extends EventEmitter {
     this._server = new DPTServer(this, this._privateKey, {
       createSocket: options.createSocket,
       timeout: options.timeout,
+      version: options.version,
       endpoint: options.endpoint
     })
     this._server.once('listening', () => this.emit('listening'))

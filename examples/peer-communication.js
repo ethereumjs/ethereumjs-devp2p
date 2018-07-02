@@ -30,9 +30,6 @@ const BOOTNODES = require('./bootstrapNodes.json').filter((node) => {
 })
 const REMOTE_CLIENTID_FILTER = ['go1.5', 'parity', 'rustc1.23.0', 'go1.6', 'go1.7', 'quorum', 'pirl', 'ubiq', 'gmc', 'gwhale', 'prichain']
 
-//Parity//v1.8.9-stable-1952d05-20180201/x86_64-linux-gnu/rustc1.23.0
-
-
 const CHECK_BLOCK_TITLE = 'Byzantium Fork' // Only for debugging/console output
 const CHECK_BLOCK_NR = 4370000
 const CHECK_BLOCK = 'b1fcff633029ee18ab6482b58ff8b6e95dd7c82a954c852157152a7a6d32785e'
@@ -40,9 +37,21 @@ const CHECK_BLOCK_HEADER = rlp.decode(Buffer.from('f9020aa0a0890da724dd95c90a726
 
 const getPeerAddr = (peer) => `${peer._socket.remoteAddress}:${peer._socket.remotePort}`
 
+const cli_version = process.argv[2];
+const VERSION_5 = 0x05
+const VERSION_4 = 0x04
+let VERSION = VERSION_4
+
+if(cli_version == 5){
+  VERSION = VERSION_5
+} else {
+  VERSION = VERSION_4
+}
+
 // DPT
 const dpt = new devp2p.DPT(PRIVATE_KEY, {
   refreshInterval: 30000,
+  version: VERSION,
   endpoint: {
     address: '0.0.0.0',
     udpPort: null,
