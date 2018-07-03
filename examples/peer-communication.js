@@ -65,7 +65,6 @@ const rlpx = new devp2p.RLPx(PRIVATE_KEY, {
     devp2p.ETH.eth63,
     devp2p.ETH.eth62
   ],
-  // remoteClientIdFilter: REMOTE_CLIENTID_FILTER,
   listenPort: null
 })
 
@@ -273,9 +272,9 @@ rlpx.on('peer:error', (peer, err) => {
   console.error(chalk.red(`Peer error (${getPeerAddr(peer)}): ${err.stack || err}`))
 })
 
-// uncomment, if you want accept incoming connections
-rlpx.listen(30303, '0.0.0.0')
-dpt.bind(30303, '0.0.0.0')
+// // uncomment, if you want accept incoming connections
+// rlpx.listen(30303, '0.0.0.0')
+// dpt.bind(30303, '0.0.0.0')
 
 for (let bootnode of BOOTNODES) {
   dpt.bootstrap(bootnode).catch((err) => {
