@@ -24,8 +24,8 @@ const address = {
   encode: function (value) {
     if (ip.isV4Format(value)) return ip.toBuffer(value)
     if (ip.isV6Format(value)) return ip.toBuffer(value)
-    //console.log(`Invalid address value: ${value}`)
-    console.log(value);
+    // console.log(`Invalid address value: ${value}`)
+    console.log(value)
     throw new Error(`Invalid address: ${value}`)
   },
   decode: function (buffer) {
@@ -76,16 +76,13 @@ const ping = {
       int2buffer(obj.version),
       endpoint.encode(obj.from),
       endpoint.encode(obj.to),
-      timestamp.encode(obj.timestamp),
+      timestamp.encode(obj.timestamp)
     ]
-
 
     // message = _pack(CMD_PING.id, payload, self.privkey)
     // self.send(node, message)
     // # Return the msg hash, which is used as a token to identify pongs.
     //   return message[:MAC_SIZE]
-    
-    
   },
   decode: function (payload) {
     return {

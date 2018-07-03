@@ -16,11 +16,11 @@ const createSocketUDP4 = dgram.createSocket.bind(null, 'udp4')
 class Server extends EventEmitter {
   constructor (dpt, privateKey, options) {
     super()
-    
+
     this._dpt = dpt
     this._privateKey = privateKey
-    
-    if(options.version == 5){
+
+    if (options.version === 5) {
       this._version = VERSION_5
     } else {
       this._version = VERSION_4
@@ -39,7 +39,7 @@ class Server extends EventEmitter {
     this._socket.on('error', (err) => this.emit('error', err))
 
     console.log(`Server listening: ${this._endpoint.address}. Devp2p version: ${this._version}`)
-    
+
     this._socket.on('message', (msg, rinfo) => {
       try {
         this._handler(msg, rinfo)
@@ -48,7 +48,7 @@ class Server extends EventEmitter {
       }
     })
   }
-  
+
   bind (...args) {
     this._isAliveCheck()
     debug('call .bind')
