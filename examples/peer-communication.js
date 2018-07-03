@@ -295,7 +295,6 @@ dpt.addPeer({ address: '127.0.0.1', udpPort: 30303, tcpPort: 30303 })
   })
   .catch((err) => console.log(`error on connection to local node: ${err.stack || err}`))
 */
-let printLessNewTxs = 1
 
 const txCache = new LRUCache({ max: 1000 })
 function onNewTx (tx, peer) {
@@ -303,11 +302,7 @@ function onNewTx (tx, peer) {
   if (txCache.has(txHashHex)) return
 
   txCache.set(txHashHex, true)
-  printLessNewTxs++
-
-  if (printLessNewTxs % 10 === 1) {
-    console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
-  }
+  console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
 }
 
 const blocksCache = new LRUCache({ max: 100 })

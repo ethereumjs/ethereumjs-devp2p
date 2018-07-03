@@ -38,7 +38,7 @@ class Server extends EventEmitter {
     this._socket.once('close', () => this.emit('close'))
     this._socket.on('error', (err) => this.emit('error', err))
 
-    console.log(`Server listening: ${this._endpoint.address}. Devp2p version: ${this._version}`)
+    // console.log(`Server listening: ${this._endpoint.address}. Devp2p version: ${this._version}`)
 
     this._socket.on('message', (msg, rinfo) => {
       try {
@@ -86,7 +86,7 @@ class Server extends EventEmitter {
         if (this._requests.get(rkey) !== undefined) {
           debug(`ping timeout: ${peer.address}:${peer.udpPort} ${peer.id && peer.id.toString('hex')}`)
           this._requests.delete(rkey)
-          // deferred.reject(new Error(`Timeout error: ping ${peer.address}:${peer.udpPort}`))
+          deferred.reject(new Error(`Timeout error: ping ${peer.address}:${peer.udpPort}`))
         } else {
           return deferred.promise
         }

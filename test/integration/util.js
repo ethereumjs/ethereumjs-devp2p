@@ -7,14 +7,16 @@ exports.getTestDPTs = function (numDPTs) {
   const dpts = []
 
   for (let i = 0; i < numDPTs; ++i) {
-    const dpt = new devp2p.DPT(devp2p._util.genPrivateKey(), {
-      endpoint: {
-        address: localhost,
-        udpPort: basePort + i,
-        tcpPort: basePort + i
-      },
-      timeout: 100
-    })
+    const dpt = new devp2p.DPT(
+      devp2p._util.genPrivateKey(), {
+        version: devp2p._util.v4,
+        endpoint: {
+          address: localhost,
+          udpPort: basePort + i,
+          tcpPort: basePort + i
+        },
+        timeout: 100
+      })
     dpt.bind(basePort + i)
     dpts.push(dpt)
   }
@@ -23,7 +25,34 @@ exports.getTestDPTs = function (numDPTs) {
 
 exports.initTwoPeerDPTSetup = function () {
   const dpts = exports.getTestDPTs(2)
-  const peer = { address: localhost, udpPort: basePort + 1 }
+  const peer = {address: localhost, udpPort: basePort + 1}
+  dpts[0].addPeer(peer)
+  return dpts
+}
+
+exports.getTestDPTsV5 = function (numDPTs) {
+  const dpts = []
+
+  for (let i = 0; i < numDPTs; ++i) {
+    const dpt = new devp2p.DPT(
+      devp2p._util.genPrivateKey(), {
+        version: devp2p._util.v5,
+        endpoint: {
+          address: localhost,
+          udpPort: basePort + i,
+          tcpPort: basePort + i
+        },
+        timeout: 100
+      })
+    dpt.bind(basePort + i)
+    dpts.push(dpt)
+  }
+  return dpts
+}
+
+exports.initTwoPeerDPTSetupV5 = function () {
+  const dpts = exports.getTestDPTsV5(2)
+  const peer = {address: localhost, udpPort: basePort + 1}
   dpts[0].addPeer(peer)
   return dpts
 }
@@ -57,7 +86,7 @@ exports.getTestRLPXs = function (numRLPXs, maxPeers, capabilities) {
 
 exports.initTwoPeerRLPXSetup = function (maxPeers, capabilities) {
   const rlpxs = exports.getTestRLPXs(2, maxPeers, capabilities)
-  const peer = { address: localhost, udpPort: basePort + 1, tcpPort: basePort + 1 }
+  const peer = {address: localhost, udpPort: basePort + 1, tcpPort: basePort + 1}
   rlpxs[0]._dpt.addPeer(peer)
   return rlpxs
 }

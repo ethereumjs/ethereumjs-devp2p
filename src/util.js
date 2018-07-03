@@ -7,6 +7,9 @@ const assert = require('assert')
 
 const debug = createDebugLogger('devp2p:util')
 
+exports.v4 = 0x04
+exports.v5 = 0x05
+
 function keccak256 (...buffers) {
   const buffer = Buffer.concat(buffers)
   return createKeccakHash('keccak256').update(buffer).digest()

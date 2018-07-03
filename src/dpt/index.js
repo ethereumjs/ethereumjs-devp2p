@@ -96,7 +96,7 @@ class DPT extends EventEmitter {
       this._kbucket.add(peer)
       return peer
     } catch (err) {
-      this._banlist.add(obj, ms('5m'))
+      this._banlist.add(obj, ms('10m'))
       throw err
     }
   }
