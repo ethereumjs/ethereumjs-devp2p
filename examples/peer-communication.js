@@ -38,7 +38,7 @@ let VERSION = devp2p._util.v4
 // option to run version 5 via cli: node -r babel-register ./examples/peer-communication.js 5
 const cliVersion = process.argv[2]
 
-if (cliVersion == 5) {
+if (cliVersion === 5) {
   VERSION = devp2p._util.v5
 }
 
@@ -299,7 +299,7 @@ function onNewTx (tx, peer) {
   if (txCache.has(txHashHex)) return
 
   txCache.set(txHashHex, true)
-  
+
   // uncomment if you want tx:hostname:port details (debug)
   // console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
 }

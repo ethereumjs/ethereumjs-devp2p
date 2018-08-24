@@ -293,7 +293,7 @@ function onNewTx (tx, peer) {
   if (txCache.has(txHashHex)) return
 
   txCache.set(txHashHex, true)
-  
+
   // uncomment if you want tx:hostname:port details (debug)
   // console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
 }

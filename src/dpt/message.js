@@ -1,4 +1,4 @@
-/* 
+/*
     This file implements Node Discovery Protocol Version 5 as defined here:
     https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md
  */
@@ -162,90 +162,88 @@ const types = {
   }
 }
 
-
-
 /*
     UDP {packet types} for node discovery protocol version 5
     Max packet size = 1280 bytes
     See: https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md#packets
  */
 
-//const messagesV5 = {hey, findNode, neighbours, requestTicket, ticket, topicRegister, topicQuery, topicNodes}
+// TODO: clean up and integreate this
 
-  const typesV5 = {
-  byNameV5: {
-    hey: 0x01,
-    findNode: 0x02,
-    neighbours: 0x03,
-    requestTicket: 0x04,
-    ticket: 0x05,
-    topicRegister: 0x06,
-    topicQuery: 0x07,
-    topicNodes: 0x08
-  },
-  byTypeV5: {
-    0x01: 'hey',
-    0x02: 'findNode',
-    0x03: 'neighbours',
-    0x04: 'requestTicket',
-    0x05: 'ticket',
-    0x06: 'topicRegister',
-    0x07: 'topicQuery',
-    0x08: 'topicNodes'
-  }
-}
+// const messagesV5 = {hey, findNode, neighbours, requestTicket, ticket, topicRegister, topicQuery, topicNodes}
 
-const hey = {}
+//  const typesV5 = {
+//  byNameV5: {
+//    hey: 0x01,
+//    findNode: 0x02,
+//    neighbours: 0x03,
+//    requestTicket: 0x04,
+//    ticket: 0x05,
+//    topicRegister: 0x06,
+//    topicQuery: 0x07,
+//    topicNodes: 0x08
+//  },
+//  byTypeV5: {
+//    0x01: 'hey',
+//    0x02: 'findNode',
+//    0x03: 'neighbours',
+//    0x04: 'requestTicket',
+//    0x05: 'ticket',
+//    0x06: 'topicRegister',
+//    0x07: 'topicQuery',
+//    0x08: 'topicNodes'
+//  }
+// }
+//
+// const hey = {}
 
 // [target-hash]
-//const findNode = {}
-//const neighbours = {}
-//const requestTicket = {}
-//const ticket = {}
-//const topicRegister = {}
-//const topicQuery = {}
-//const topicNodes = {}
+// const findNode = {}
+// const neighbours = {}
+// const requestTicket = {}
+// const ticket = {}
+// const topicRegister = {}
+// const topicQuery = {}
+// const topicNodes = {}
 
-
-
-
+// TODO: clean up and integreate this
 
 // Node discovery v5
-const topicquery = {
-  encode: function (obj) {
-    return [
-      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
-      timestamp.encode(obj.timestamp)
-    ]
-  },
-  decode: function (payload) {
-    return {
-      peers: payload[0].map((data) => {
-        return { endpoint: endpoint.decode(data), id: data[3] }
-      }),
-      timestamp: timestamp.decode(payload[1])
-    }
-  }
-}
+// const topicquery = {
+//  encode: function (obj) {
+//    return [
+//      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
+//      timestamp.encode(obj.timestamp)
+//    ]
+//  },
+//  decode: function (payload) {
+//    return {
+//      peers: payload[0].map((data) => {
+//        return { endpoint: endpoint.decode(data), id: data[3] }
+//      }),
+//      timestamp: timestamp.decode(payload[1])
+//    }
+//  }
+// }
+// TODO: clean up and integreate this
 
 // Node discovery v5
-const topicnodes = {
-  encode: function (obj) {
-    return [
-      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
-      timestamp.encode(obj.timestamp)
-    ]
-  },
-  decode: function (payload) {
-    return {
-      peers: payload[0].map((data) => {
-        return { endpoint: endpoint.decode(data), id: data[3] }
-      }),
-      timestamp: timestamp.decode(payload[1])
-    }
-  }
-}
-
+// const topicnodes = {
+//  encode: function (obj) {
+//    return [
+//      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
+//      timestamp.encode(obj.timestamp)
+//    ]
+//  },
+//  decode: function (payload) {
+//    return {
+//      peers: payload[0].map((data) => {
+//        return { endpoint: endpoint.decode(data), id: data[3] }
+//      }),
+//      timestamp: timestamp.decode(payload[1])
+//    }
+//  }
+// }
 
 // [0, 32) data hash
 // [32, 96) signature

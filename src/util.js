@@ -90,11 +90,13 @@ function createDeferred () {
   return deferred
 }
 
+// TODO: clean up and integreate this
+
 // used for v5 nonce packet -- https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md#packets
-function generateNonce () {
-  const nonce = randomBytes(16)
-  return nonce
-}
+// function generateNonce () {
+//  const nonce = randomBytes(16)
+//  return nonce
+// }
 
 module.exports = {
   keccak256,

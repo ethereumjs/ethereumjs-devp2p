@@ -18,7 +18,7 @@ class Server extends EventEmitter {
     this._privateKey = privateKey
 
     // todo: add debugging -verbose flag here to enable tx outpus
-    if (options.version == 5) {
+    if (options.version === 5) {
       this._version = v5
     } else {
       this._version = v4
@@ -37,7 +37,7 @@ class Server extends EventEmitter {
     this._socket.once('listening', () => this.emit('listening'))
     this._socket.once('close', () => this.emit('close'))
     this._socket.on('error', (err) => this.emit('error', err))
-    
+
     this._socket.on('message', (msg, rinfo) => {
       try {
         this._handler(msg, rinfo)
@@ -77,7 +77,7 @@ class Server extends EventEmitter {
 
     const deferred = createDeferred()
     const rkey = hash.toString('hex')
-    
+
     this._requests.set(rkey, {
       peer,
       deferred,
@@ -91,7 +91,7 @@ class Server extends EventEmitter {
         }
       }, this._timeout)
     })
-    
+
     this._requestsCache.set(rckey, deferred.promise)
     return deferred.promise
   }
