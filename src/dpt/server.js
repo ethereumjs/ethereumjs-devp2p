@@ -4,12 +4,9 @@ const ms = require('ms')
 const createDebugLogger = require('debug')
 const LRUCache = require('lru-cache')
 const message = require('./message')
-const { keccak256, pk2id, createDeferred } = require('../util')
-
+const { keccak256, pk2id, createDeferred, v4, v5 } = require('../util')
+const chalk = require('chalk')
 const debug = createDebugLogger('devp2p:dpt:server')
-
-const VERSION_5 = 0x05
-const VERSION_4 = 0x04
 
 const createSocketUDP4 = dgram.createSocket.bind(null, 'udp4')
 
@@ -20,11 +17,13 @@ class Server extends EventEmitter {
     this._dpt = dpt
     this._privateKey = privateKey
 
-    if (options.version === 5) {
-      this._version = VERSION_5
+    if (options.version == 5) {
+      this._version = v5
     } else {
-      this._version = VERSION_4
+      this._version = v4
     }
+
+    console.log(chalk.green(`Starting node discovery protocol with version: ${this._version}`))
 
     this._timeout = options.timeout || ms('10s')
     this._endpoint = options.endpoint || { address: '0.0.0.0', udpPort: null, tcpPort: null }
@@ -37,9 +36,7 @@ class Server extends EventEmitter {
     this._socket.once('listening', () => this.emit('listening'))
     this._socket.once('close', () => this.emit('close'))
     this._socket.on('error', (err) => this.emit('error', err))
-
-    // console.log(`Server listening: ${this._endpoint.address}. Devp2p version: ${this._version}`)
-
+    
     this._socket.on('message', (msg, rinfo) => {
       try {
         this._handler(msg, rinfo)
@@ -79,6 +76,7 @@ class Server extends EventEmitter {
 
     const deferred = createDeferred()
     const rkey = hash.toString('hex')
+    
     this._requests.set(rkey, {
       peer,
       deferred,
@@ -92,6 +90,7 @@ class Server extends EventEmitter {
         }
       }, this._timeout)
     })
+    
     this._requestsCache.set(rckey, deferred.promise)
     return deferred.promise
   }

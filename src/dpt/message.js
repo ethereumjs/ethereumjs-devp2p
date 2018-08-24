@@ -1,3 +1,7 @@
+/* 
+    This file implements Node Discovery Protocol Version 5 as defined here:
+    https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md
+ */
 const ip = require('ip')
 const rlp = require('rlp-encoding')
 const secp256k1 = require('secp256k1')
@@ -141,6 +145,71 @@ const neighbours = {
   }
 }
 
+const messages = {ping, pong, findneighbours, neighbours}
+
+const types = {
+  byName: {
+    ping: 0x01,
+    pong: 0x02,
+    findneighbours: 0x03,
+    neighbours: 0x04
+  },
+  byType: {
+    0x01: 'ping',
+    0x02: 'pong',
+    0x03: 'findneighbours',
+    0x04: 'neighbours'
+  }
+}
+
+
+
+/*
+    UDP {packet types} for node discovery protocol version 5
+    Max packet size = 1280 bytes
+    See: https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md#packets
+ */
+
+//const messagesV5 = {hey, findNode, neighbours, requestTicket, ticket, topicRegister, topicQuery, topicNodes}
+
+  const typesV5 = {
+  byNameV5: {
+    hey: 0x01,
+    findNode: 0x02,
+    neighbours: 0x03,
+    requestTicket: 0x04,
+    ticket: 0x05,
+    topicRegister: 0x06,
+    topicQuery: 0x07,
+    topicNodes: 0x08
+  },
+  byTypeV5: {
+    0x01: 'hey',
+    0x02: 'findNode',
+    0x03: 'neighbours',
+    0x04: 'requestTicket',
+    0x05: 'ticket',
+    0x06: 'topicRegister',
+    0x07: 'topicQuery',
+    0x08: 'topicNodes'
+  }
+}
+
+const hey = {}
+
+// [target-hash]
+//const findNode = {}
+//const neighbours = {}
+//const requestTicket = {}
+//const ticket = {}
+//const topicRegister = {}
+//const topicQuery = {}
+//const topicNodes = {}
+
+
+
+
+
 // Node discovery v5
 const topicquery = {
   encode: function (obj) {
@@ -159,6 +228,7 @@ const topicquery = {
   }
 }
 
+// Node discovery v5
 const topicnodes = {
   encode: function (obj) {
     return [
@@ -176,26 +246,6 @@ const topicnodes = {
   }
 }
 
-const messages = { ping, pong, findneighbours, neighbours, topicquery, topicnodes }
-
-const types = {
-  byName: {
-    ping: 0x01,
-    pong: 0x02,
-    findneighbours: 0x03,
-    neighbours: 0x04,
-    topicquery: 0x05,
-    topicnodes: 0x06
-  },
-  byType: {
-    0x01: 'ping',
-    0x02: 'pong',
-    0x03: 'findneighbours',
-    0x04: 'neighbours',
-    0x05: 'topicquery',
-    0x06: 'topicnodes'
-  }
-}
 
 // [0, 32) data hash
 // [32, 96) signature

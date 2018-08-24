@@ -152,7 +152,7 @@ class Peer extends EventEmitter {
 
       case 'Body':
         const body = this._eciesSession.parseBody(data)
-        debug(`Received body ${this._socket.remoteAddress}:${this._socket.remotePort} ${body.toString('hex')}`)
+        console.log(`Received body ${this._socket.remoteAddress}:${this._socket.remotePort} ${body.toString('hex')}`)
 
         this._state = 'Header'
         this._nextPacketSize = 32
@@ -170,7 +170,7 @@ class Peer extends EventEmitter {
 
         const msgCode = code - obj.offset
         const prefix = this.getMsgPrefix(msgCode)
-        debug(`Received ${prefix} (message code: ${code} - ${obj.offset} = ${msgCode}) ${this._socket.remoteAddress}:${this._socket.remotePort}`)
+        console.log(`Received ${prefix} (message code: ${code} - ${obj.offset} = ${msgCode}) ${this._socket.remoteAddress}:${this._socket.remotePort}`)
 
         try {
           obj.protocol._handleMessage(msgCode, body.slice(1))

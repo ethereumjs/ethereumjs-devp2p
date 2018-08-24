@@ -12,6 +12,7 @@ const assert = require('assert')
 const { randomBytes } = require('crypto')
 const rlp = require('rlp-encoding')
 const Buffer = require('safe-buffer').Buffer
+
 const PRIVATE_KEY = randomBytes(32)
 const CHAIN_ID = 1
 
@@ -32,15 +33,8 @@ const CHECK_BLOCK_HEADER = rlp.decode(Buffer.from('f9020aa0a0890da724dd95c90a726
 
 const getPeerAddr = (peer) => `${peer._socket.remoteAddress}:${peer._socket.remotePort}`
 
-// set the default version to 4
-let VERSION = devp2p._util.v4
-
-// option to run version 5 via cli: node -r babel-register ./examples/peer-communication.js 5
-const cliVersion = process.argv[2]
-
-if (cliVersion == 5) {
-  VERSION = devp2p._util.v5
-}
+const VERSION_5 = 0x05
+let VERSION = VERSION_5
 
 // DPT
 const dpt = new devp2p.DPT(PRIVATE_KEY, {
@@ -270,7 +264,7 @@ rlpx.on('peer:error', (peer, err) => {
   console.error(chalk.red(`Peer error (${getPeerAddr(peer)}): ${err.stack || err}`))
 })
 
-// uncomment, if you want accept incoming connections
+// // uncomment, if you want accept incoming connections
 // rlpx.listen(30303, '0.0.0.0')
 // dpt.bind(30303, '0.0.0.0')
 

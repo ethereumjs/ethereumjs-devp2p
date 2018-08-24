@@ -4,11 +4,14 @@ const Buffer = require('safe-buffer').Buffer
 const createDebugLogger = require('debug')
 const createKeccakHash = require('keccak')
 const assert = require('assert')
-
 const debug = createDebugLogger('devp2p:util')
 
-exports.v4 = 0x04
-exports.v5 = 0x05
+// node discovery protocol versions
+const v4 = 0x04
+const v5 = 0x05
+
+// max packet size in bytes
+const MAXPACKETSIZE = 1280
 
 function keccak256 (...buffers) {
   const buffer = Buffer.concat(buffers)
@@ -87,6 +90,12 @@ function createDeferred () {
   return deferred
 }
 
+// used for v5 nonce packet -- https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md#packets
+function generateNonce () {
+  const nonce = randomBytes(16)
+  return nonce
+}
+
 module.exports = {
   keccak256,
   genPrivateKey,
@@ -97,5 +106,8 @@ module.exports = {
   zfill,
   xor,
   assertEq,
-  createDeferred
+  createDeferred,
+  v4,
+  v5,
+  MAXPACKETSIZE
 }
