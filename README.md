@@ -62,6 +62,41 @@ node -r babel-register ./examples/peer-communication.js
 Maintain/manage a list of peers, see [./src/dpt/](./src/dpt/), also 
 includes node discovery ([./src/dpt/server.js](./src/dpt/server.js))
 
+### Node discovery v5 support (dscv5)
+
+Node discovery v5 (dscv5) support is turned off by default. 
+
+It is currently in development on this branch:
+[github.com/tcsiwula/ethereumjs-devp2p/tree/node-discovery-v5](https://github.com/tcsiwula/ethereumjs-devp2p/tree/node-discovery-v5).
+
+#### Running node discovery v5
+
+Try the experimental discv5 peer-communication.js example.
+Run the following:
+``` 
+npm run discv5
+```
+or:
+``` 
+npm install
+npm run build
+node -r babel-register ./examples/peer-communication.js 5
+``` 
+
+#### Running node discovery v4
+
+Try the stable discv4 peer-communication.js example.
+Run the following:
+``` 
+npm run discv4
+```
+or:
+``` 
+npm install
+npm run build
+node -r babel-register ./examples/peer-communication.js 4
+``` 
+
 ### Usage
 
 Create your peer table:

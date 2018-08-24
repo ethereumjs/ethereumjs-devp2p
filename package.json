@@ -46,7 +46,9 @@
     "lint": "standard --fix",
     "prepublish": "npm run build",
     "test": "npm run lint && npm run unit && npm run integration",
-    "unit": "tape -r babel-register test/*.js"
+    "unit": "tape -r babel-register test/*.js",
+    "discv5": "node -r babel-register ./examples/peer-communication.js 5",
+    "discv4": "node -r babel-register ./examples/peer-communication.js 4"
   },
   "dependencies": {
     "babel-runtime": "^6.11.6",
