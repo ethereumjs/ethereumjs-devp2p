@@ -17,6 +17,7 @@ class Server extends EventEmitter {
     this._dpt = dpt
     this._privateKey = privateKey
 
+    // todo: add debugging -verbose flag here to enable tx outpus
     if (options.version == 5) {
       this._version = v5
     } else {

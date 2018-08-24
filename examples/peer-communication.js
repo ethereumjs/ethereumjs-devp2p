@@ -299,7 +299,9 @@ function onNewTx (tx, peer) {
   if (txCache.has(txHashHex)) return
 
   txCache.set(txHashHex, true)
-  console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
+  
+  // uncomment if you want tx:hostname:port details (debug)
+  // console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
 }
 
 const blocksCache = new LRUCache({ max: 100 })
