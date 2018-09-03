@@ -31,7 +31,7 @@ dpt.on('peer:removed', (peer) => {
 })
 
 // for accept incoming connections uncomment next line
-// dpt.bind(30303, '0.0.0.0')
+ dpt.bind(30303, '0.0.0.0')
 
 for (let bootnode of BOOTNODES) {
   dpt.bootstrap(bootnode).catch((err) => console.error(chalk.bold.red(err.stack || err)))

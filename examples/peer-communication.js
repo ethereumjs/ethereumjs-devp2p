@@ -38,9 +38,16 @@ let VERSION = devp2p._util.v4
 // option to run version 5 via cli: node -r babel-register ./examples/peer-communication.js 5
 const cliVersion = process.argv[2]
 
-if (cliVersion === 5) {
+if (cliVersion === "5") {
   VERSION = devp2p._util.v5
 }
+
+console.log(`peer-communication.js`)
+console.log(`VERSION = ${VERSION}`)
+console.log(`cliVersion = ${cliVersion} `)
+console.log(`cliVersion === 5 ===>  ${cliVersion === 5} `)
+console.log(`cliVersion === "5" ===>  ${cliVersion === "5"} `)
+
 
 // DPT
 const dpt = new devp2p.DPT(PRIVATE_KEY, {
