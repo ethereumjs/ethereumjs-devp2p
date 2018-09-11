@@ -35,21 +35,30 @@ const hey = {
   }
 };
 
-const pong = {
-  encode: function(obj) {
-    return [endpoint.encode(obj.to), obj.hash, timestamp.encode(obj.timestamp)];
-  },
-  decode: function(payload) {
-    return {
-      to: endpoint.decode(payload[0]),
-      hash: payload[1],
-      timestamp: timestamp.decode(payload[2])
-    };
-  }
-};
+// const pong = {
+//   encode: function(obj) {
+//     return [endpoint.encode(obj.to), obj.hash, timestamp.encode(obj.timestamp)];
+//   },
+//   decode: function(payload) {
+//     return {
+//       to: endpoint.decode(payload[0]),
+//       hash: payload[1],
+//       timestamp: timestamp.decode(payload[2])
+//     };
+//   }
+// };
 
+/*
+  findNode packet (0x03)
+  requests a neightbors packet containing the closest know nodes to the target hash.
+*/
 const findNode = {
+  // console.log(chalk.yellow(`+++++ +++++`));
+  // console.log(chalk.yellow("******* findNode == " + info.typename));
+  // console.log(chalk.yellow(`+++++ +++++`));
   encode: function(obj) {
+    console.log(chalk.blue("******* findNode.encode == "));
+    console.log(chalk.blue(`+++++ +++++`));
     return [endpoint.encode(obj.to), obj.hash, timestamp.encode(obj.timestamp)];
   },
   decode: function(payload) {
@@ -61,7 +70,7 @@ const findNode = {
   }
 };
 
-const neighbours = {
+const neighbors = {
   encode: function(obj) {
     return [obj.id, timestamp.encode(obj.timestamp)];
   },
@@ -258,7 +267,7 @@ function decode(buffer) {
 const messages = {
   hey,
   findNode,
-  neighbours,
+  neighbors,
   requestTicket,
   ticket,
   topicRegister,
@@ -270,7 +279,7 @@ const types = {
   byName: {
     hey: 0x01,
     findNode: 0x02,
-    neighbours: 0x03,
+    neighbors: 0x03,
     requestTicket: 0x04,
     ticket: 0x05,
     topicRegister: 0x06,
@@ -280,7 +289,7 @@ const types = {
   byType: {
     0x01: "hey",
     0x02: "findNode",
-    0x03: "neighbours",
+    0x03: "neighbors",
     0x04: "requestTicket",
     0x05: "ticket",
     0x06: "topicRegister",

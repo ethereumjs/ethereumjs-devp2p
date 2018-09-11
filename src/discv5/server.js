@@ -29,6 +29,7 @@ class Server extends EventEmitter {
     );
 
     this._timeout = options.timeout || ms("10s");
+
     this._endpoint = options.endpoint || {
       address: "0.0.0.0",
       udpPort: null,
@@ -48,8 +49,15 @@ class Server extends EventEmitter {
     this._socket.once("close", () => this.emit("close"));
     this._socket.on("error", err => this.emit("error", err));
 
+    // processes incoming messages
     this._socket.on("message", (msg, rinfo) => {
       try {
+        console.log(chalk.green(`+++++ +++++ message received --> server.js`));
+        // console.log(
+        //   chalk.green(`msg =  ${JSON.stringify(message.decode(msg))}`)
+        // );
+        console.log(chalk.green(`rinfo =  ${JSON.stringify(rinfo)}`));
+
         this._handler(msg, rinfo);
       } catch (err) {
         this.emit("error", err);
@@ -113,15 +121,17 @@ class Server extends EventEmitter {
 
   // hey(peer, id) {
   //   this._isAliveCheck();
-  //   // console.log("id == " + id);
-  //   // console.log("peer == " + peer);
-  //
   //   this._send(peer, "hey", { id });
   // }
 
-  neighbours(peer, id) {
+  // requestTicket(peer, id) {
+  //   this._isAliveCheck();
+  //   this._send(peer, "requestTicket", { id });
+  // }
+
+  neighbors(peer, id) {
     this._isAliveCheck();
-    this._send(peer, "neighbours", { id });
+    this._send(peer, "neighbors", { id });
   }
 
   _isAliveCheck() {
@@ -154,8 +164,13 @@ class Server extends EventEmitter {
     return msg.slice(0, 32); // message id
   }
 
+  // processes each incoming message by it's message type, msg in binary data
   _handler(msg, rinfo) {
     const info = message.decode(msg);
+
+    console.log("******* info.typename == " + info.typename);
+    console.log(chalk.green(`+++++ +++++`));
+
     const peerId = pk2id(info.publicKey);
     debug(
       `received ${info.typename} from ${rinfo.address}:${
@@ -174,17 +189,17 @@ class Server extends EventEmitter {
     }
 
     switch (info.typename) {
-      case "ping":
-        Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
-        this._send(rinfo, "pong", {
-          to: {
-            address: rinfo.address,
-            udpPort: rinfo.port,
-            tcpPort: info.data.from.tcpPort
-          },
-          hash: msg.slice(0, 32)
-        });
-        break;
+      // case "ping":
+      //   Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
+      //   this._send(rinfo, "pong", {
+      //     to: {
+      //       address: rinfo.address,
+      //       udpPort: rinfo.port,
+      //       tcpPort: info.data.from.tcpPort
+      //     },
+      //     hash: msg.slice(0, 32)
+      //   });
+      //   break;
 
       // case "pong":
       //   var rkey = info.data.hash.toString("hex");
@@ -205,10 +220,9 @@ class Server extends EventEmitter {
       //   }
       //   break;
 
-      // TODO: FINISH HERE
       case "hey":
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
-        this._send(rinfo, "neighbours", {
+        this._send(rinfo, "hey", {
           to: {
             address: rinfo.address,
             udpPort: rinfo.port,
@@ -218,15 +232,38 @@ class Server extends EventEmitter {
         });
         break;
 
-      // TODO: FINISH HERE
+      /*
+          findNode packet (0x03)
+          requests a neighbors packet containing the closest know nodes to the target hash.
+      */
       case "findNode":
+        //ping example, denotes response message type
+        // Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
+        // this._send(rinfo, "neighbors", {
+        //   to: {
+        //     address: rinfo.address,
+        //     udpPort: rinfo.port,
+        //     tcpPort: info.data.from.tcpPort
+        //   },
+        //   hash: msg.slice(0, 32)
+        // });
+        // break;
+
+        console.log(chalk.blue("-------- server.findNode()"));
         var rkey = info.data.hash.toString("hex");
+
         const rkeyParity = this._parityRequestMap.get(rkey);
+        console.log(chalk.blue("-------- rkeyParity = " + rkeyParity));
+
         if (rkeyParity) {
           rkey = rkeyParity;
           this._parityRequestMap.delete(rkeyParity);
         }
         const request = this._requests.get(rkey);
+        console.log(
+          chalk.blue("-------- request = " + JSON.stringify(request))
+        );
+
         if (request) {
           this._requests.delete(rkey);
           request.deferred.resolve({
@@ -238,18 +275,52 @@ class Server extends EventEmitter {
         }
         break;
 
-      case "neighbours":
+      /*
+          findNode packet (0x03)
+          requests a neighbors packet containing the closest know nodes to the target hash.
+        */
+      // const findNode = {
+      //   // console.log(chalk.yellow(`+++++ +++++`));
+      //
+      //   // console.log(chalk.yellow("******* findNode == " + info.typename));
+      //   // console.log(chalk.yellow(`+++++ +++++`));
+      //   encode: function(obj) {
+      //     console.log(chalk.blue("******* findNode.encode == "));
+      //     console.log(chalk.blue(`+++++ +++++`));
+      //     return [endpoint.encode(obj.to), obj.hash, timestamp.encode(obj.timestamp)];
+      //   },
+      //   decode: function(payload) {
+      //     return {
+      //       to: endpoint.decode(payload[0]),
+      //       hash: payload[1],
+      //       timestamp: timestamp.decode(payload[2])
+      //     };
+      //   }
+      // };
+
+      case "neighbors":
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
-        this._send(rinfo, "neighbours", {
+        this._send(rinfo, "neighbors", {
           peers: this._dpt.getClosestPeers(info.data.id)
         });
         break;
 
-      // case "neighbours":
+      // case "neighbors":
       //   this.emit("peers", info.data.peers.map(peer => peer.endpoint));
       //   break;
 
-      // TODO: FINISH ticket
+      case "requestTicket":
+        Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
+        this._send(rinfo, "pong", {
+          to: {
+            address: rinfo.address,
+            udpPort: rinfo.port,
+            tcpPort: info.data.from.tcpPort
+          },
+          hash: msg.slice(0, 32)
+        });
+        break;
+
       case "ticket":
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
         this._send(rinfo, "pong", {
@@ -262,7 +333,6 @@ class Server extends EventEmitter {
         });
         break;
 
-      // TODO: FINISH HERE
       case "topicRegister":
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
         this._send(rinfo, "pong", {
@@ -275,7 +345,6 @@ class Server extends EventEmitter {
         });
         break;
 
-      // TODO: FINISH HERE
       case "topicQuery":
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
         this._send(rinfo, "pong", {
@@ -288,7 +357,6 @@ class Server extends EventEmitter {
         });
         break;
 
-      // TODO: FINISH HERE
       case "topicNodes":
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port });
         this._send(rinfo, "pong", {

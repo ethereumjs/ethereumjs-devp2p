@@ -4,17 +4,13 @@ const Buffer = require("safe-buffer").Buffer;
 const { randomBytes } = require("crypto");
 const createDebugLogger = require("debug");
 const ms = require("ms");
-const { pk2id } = require("../util");
+const { pk2id, id2pk } = require("../util");
 const KBucket = require("./kbucket");
 const BanList = require("../dpt/ban-list");
-const DISCV5Server = require("./server");
+const Server = require("./server");
 const debug = createDebugLogger("devp2p:dpt");
-
-/*
-    discv5/index.js
-    -- see also kbucket.js (manages list o f peers in dht)
-    --          server.js server to handel discovery communication
-*/
+const chalk = require("chalk");
+const message = require("./message");
 
 class DISCV5 extends EventEmitter {
   constructor(privateKey, options) {
@@ -23,19 +19,24 @@ class DISCV5 extends EventEmitter {
     this._privateKey = Buffer.from(privateKey);
     this._id = pk2id(secp256k1.publicKeyCreate(this._privateKey, false));
 
-    this._banlist = new BanList();
+    // debug binary data
+    const info = id2pk(this._id);
 
+    console.log(chalk.red(`+++++ index.js == DISCV5.this._id == ${info}`));
+
+    this._banlist = new BanList();
     this._kbucket = new KBucket(this._id);
     this._kbucket.on("added", peer => this.emit("peer:added", peer));
     this._kbucket.on("removed", peer => this.emit("peer:removed", peer));
     this._kbucket.on("hey", (...args) => this._onKBucketPing(...args));
 
-    this._server = new DISCV5Server(this, this._privateKey, {
+    this._server = new Server(this, this._privateKey, {
       createSocket: options.createSocket,
       timeout: options.timeout,
       version: options.version,
       endpoint: options.endpoint
     });
+
     this._server.once("listening", () => this.emit("listening"));
     this._server.once("close", () => this.emit("close"));
     this._server.on("peers", peers => this._onServerPeers(peers));
@@ -87,7 +88,7 @@ class DISCV5 extends EventEmitter {
     debug(`bootstrap with peer ${peer.address}:${peer.udpPort}`);
 
     peer = await this.addPeer(peer);
-    this._server.neighbours(peer, this._id);
+    this._server.neighbors(peer, this._id);
   }
 
   async addPeer(obj) {
@@ -135,7 +136,7 @@ class DISCV5 extends EventEmitter {
     const peers = this.getPeers();
     debug(`call .refresh (${peers.length} peers in table)`);
 
-    for (let peer of peers) this._server.neighbours(peer, randomBytes(64));
+    for (let peer of peers) this._server.neighbors(peer, randomBytes(64));
   }
 }
 
