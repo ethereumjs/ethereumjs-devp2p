@@ -62,12 +62,20 @@ node -r babel-register ./examples/peer-communication.js
 Maintain/manage a list of peers, see [./src/dpt/](./src/dpt/), also
 includes node discovery ([./src/dpt/server.js](./src/dpt/server.js))
 
+
+## Branches
+- [master](https://github.com/ethereumjs/ethereumjs-devp2p)
+- [discovery-v5](https://github.com/tcsiwula/ethereumjs-devp2p/tree/discovery-v5) (wip)
+- [discv4-enr-extension-support](https://github.com/tcsiwula/ethereumjs-devp2p/tree/discv4-enr-extension-support) (wip)
+- [les](https://github.com/ethereumjs/ethereumjs-devp2p) (todo)
+
+
 ### Node discovery v5 support (dscv5)
 
 Node discovery v5 (dscv5) support is turned off by default.
 
 It is currently in development on this branch:
-[github.com/tcsiwula/ethereumjs-devp2p/tree/node-discovery-v5](https://github.com/tcsiwula/ethereumjs-devp2p/tree/node-discovery-v5).
+[github.com/tcsiwula/ethereumjs-devp2p/tree/discovery-v5](https://github.com/tcsiwula/ethereumjs-devp2p/tree/discovery-v5).
 
 #### Running node discovery v5
 
