@@ -174,10 +174,6 @@ rlpx.on("peer:added", peer => {
       case devp2p.ETH.MESSAGE_CODES.BLOCK_HEADERS:
         if (!forkVerified) {
           if (payload.length !== 1) {
-            console.log(
-              `${addr} expected one header for ${CHECK_BLOCK_TITLE} verify (received: ${
-                payload.length
-              })`
             );
             peer.disconnect(devp2p.RLPx.DISCONNECT_REASONS.USELESS_PEER);
             break;
@@ -186,20 +182,10 @@ rlpx.on("peer:added", peer => {
           const expectedHash = CHECK_BLOCK;
           const header = new EthereumBlock.Header(payload[0]);
           if (header.hash().toString("hex") === expectedHash) {
-            // console.log(`${addr} verified to be on the same side of the ${CHECK_BLOCK_TITLE}`)
             clearTimeout(forkDrop);
             forkVerified = true;
           }
         } else {
-          if (payload.length > 1) {
-            console.log(
-              `${addr} not more than one block header expected (received: ${
-                payload.length
-              })`
-            );
-            break;
-          }
-
           let isValidPayload = false;
           const header = new EthereumBlock.Header(payload[0]);
           while (requests.headers.length > 0) {
@@ -319,17 +305,14 @@ rlpx.on("peer:removed", (peer, reasonCode, disconnectWe) => {
 
 rlpx.on("peer:error", (peer, err) => {
   if (err.code === "ECONNRESET") return;
-
   if (err instanceof assert.AssertionError) {
     const peerId = peer.getId();
     if (peerId !== null) dpt.banPeer(peerId, ms("5m"));
-
     console.error(
       chalk.red(`Peer error (${getPeerAddr(peer)}): ${err.message}`)
     );
     return;
   }
-
   console.error(
     chalk.red(`Peer error (${getPeerAddr(peer)}): ${err.stack || err}`)
   );
@@ -345,28 +328,11 @@ for (let bootnode of BOOTNODES) {
   });
 }
 
-// connect to local ethereum node (debug)
-/*
-dpt.addPeer({ address: '127.0.0.1', udpPort: 30303, tcpPort: 30303 })
-  .then((peer) => {
-    return rlpx.connect({
-      id: peer.id,
-      address: peer.address,
-      port: peer.tcpPort
-    })
-  })
-  .catch((err) => console.log(`error on connection to local node: ${err.stack || err}`))
-*/
-
 const txCache = new LRUCache({ max: 1000 });
 function onNewTx(tx, peer) {
   const txHashHex = tx.hash().toString("hex");
   if (txCache.has(txHashHex)) return;
-
   txCache.set(txHashHex, true);
-
-  // uncomment if you want tx:hostname:port details (debug)
-  // console.log(`New tx: ${txHashHex} (from ${getPeerAddr(peer)})`)
 }
 
 const blocksCache = new LRUCache({ max: 100 });
@@ -374,17 +340,7 @@ function onNewBlock(block, peer) {
   const blockHashHex = block.hash().toString("hex");
   const blockNumber = devp2p._util.buffer2int(block.header.number);
   if (blocksCache.has(blockHashHex)) return;
-
   blocksCache.set(blockHashHex, true);
-  console.log(
-    `----------------------------------------------------------------------------------------------------------`
-  );
-  console.log(
-    `New block ${blockNumber}: ${blockHashHex} (from ${getPeerAddr(peer)})`
-  );
-  console.log(
-    `----------------------------------------------------------------------------------------------------------`
-  );
   for (let tx of block.transactions) onNewTx(tx, peer);
 }
 

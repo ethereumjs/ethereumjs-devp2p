@@ -19,11 +19,6 @@ const hey = {
       endpoint.encode(obj.to),
       timestamp.encode(obj.timestamp)
     ];
-
-    // message = _pack(CMD_PING.id, payload, self.privkey)
-    // self.send(node, message)
-    // # Return the msg hash, which is used as a token to identify pongs.
-    //   return message[:MAC_SIZE]
   },
   decode: function(payload) {
     return {
@@ -35,30 +30,12 @@ const hey = {
   }
 };
 
-// const pong = {
-//   encode: function(obj) {
-//     return [endpoint.encode(obj.to), obj.hash, timestamp.encode(obj.timestamp)];
-//   },
-//   decode: function(payload) {
-//     return {
-//       to: endpoint.decode(payload[0]),
-//       hash: payload[1],
-//       timestamp: timestamp.decode(payload[2])
-//     };
-//   }
-// };
-
 /*
   findNode packet (0x03)
   requests a neightbors packet containing the closest know nodes to the target hash.
 */
 const findNode = {
-  // console.log(chalk.yellow(`+++++ +++++`));
-  // console.log(chalk.yellow("******* findNode == " + info.typename));
-  // console.log(chalk.yellow(`+++++ +++++`));
   encode: function(obj) {
-    console.log(chalk.blue("******* findNode.encode == "));
-    console.log(chalk.blue(`+++++ +++++`));
     return [endpoint.encode(obj.to), obj.hash, timestamp.encode(obj.timestamp)];
   },
   decode: function(payload) {
@@ -193,9 +170,10 @@ const address = {
 
     const str = buffer.toString();
     if (ip.isV4Format(str) || ip.isV6Format(str)) return str;
-
-    // also can be host, but skip it right now (because need async function for resolve)
-    // throw new Error(`Invalid address buffer: ${buffer.toString("hex")}`);
+    /*
+      also can be host, but skip it right now (because need async function for resolve)
+      throw new Error(`Invalid address buffer: ${buffer.toString("hex")}`);
+    */
   }
 };
 
@@ -207,7 +185,6 @@ const port = {
   },
   decode: function(buffer) {
     if (buffer.length === 0) return null;
-    // if (buffer.length !== 2) throw new RangeError(`Invalid port buffer: ${buffer.toString('hex')}`)
     return buffer2int(buffer);
   }
 };
@@ -234,7 +211,6 @@ function encode(typename, data, privateKey) {
   if (type === undefined) throw new Error(`Invalid typename: ${typename}`);
   const encodedMsg = messages[typename].encode(data);
   const typedata = Buffer.concat([Buffer.from([type]), rlp.encode(encodedMsg)]);
-
   const sighash = keccak256(typedata);
   const sig = secp256k1.sign(sighash, privateKey);
   const hashdata = Buffer.concat([

@@ -42,13 +42,6 @@ if (cliVersion === "5") {
   VERSION = devp2p._util.v5
 }
 
-console.log(`peer-communication.js`)
-console.log(`VERSION = ${VERSION}`)
-console.log(`cliVersion = ${cliVersion} `)
-console.log(`cliVersion === 5 ===>  ${cliVersion === 5} `)
-console.log(`cliVersion === "5" ===>  ${cliVersion === "5"} `)
-
-
 // DPT
 const dpt = new devp2p.DPT(PRIVATE_KEY, {
   refreshInterval: 30000,
@@ -150,7 +143,7 @@ rlpx.on('peer:added', (peer) => {
       case devp2p.ETH.MESSAGE_CODES.BLOCK_HEADERS:
         if (!forkVerified) {
           if (payload.length !== 1) {
-            console.log(`${addr} expected one header for ${CHECK_BLOCK_TITLE} verify (received: ${payload.length})`)
+            //console.log(`${addr} expected one header for ${CHECK_BLOCK_TITLE} verify (received: ${payload.length})`)
             peer.disconnect(devp2p.RLPx.DISCONNECT_REASONS.USELESS_PEER)
             break
           }
