@@ -25,7 +25,7 @@ exports.getTestDPTs = function (numDPTs) {
 
 exports.initTwoPeerDPTSetup = function () {
   const dpts = exports.getTestDPTs(2)
-  const peer = {address: localhost, udpPort: basePort + 1}
+  const peer = { address: localhost, udpPort: basePort + 1 }
   dpts[0].addPeer(peer)
   return dpts
 }
@@ -52,7 +52,7 @@ exports.getTestDPTsV5 = function (numDPTs) {
 
 exports.initTwoPeerDPTSetupV5 = function () {
   const dpts = exports.getTestDPTsV5(2)
-  const peer = {address: localhost, udpPort: basePort + 1}
+  const peer = { address: localhost, udpPort: basePort + 1 }
   dpts[0].addPeer(peer)
   return dpts
 }
@@ -86,7 +86,7 @@ exports.getTestRLPXs = function (numRLPXs, maxPeers, capabilities) {
 
 exports.initTwoPeerRLPXSetup = function (maxPeers, capabilities) {
   const rlpxs = exports.getTestRLPXs(2, maxPeers, capabilities)
-  const peer = {address: localhost, udpPort: basePort + 1, tcpPort: basePort + 1}
+  const peer = { address: localhost, udpPort: basePort + 1, tcpPort: basePort + 1 }
   rlpxs[0]._dpt.addPeer(peer)
   return rlpxs
 }

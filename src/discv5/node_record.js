@@ -31,25 +31,23 @@
 //
 //
 class EthereumNodeRecord {
-	constructor() {
-		super();
-	}
+  constructor () {
+    super()
+  }
 
-	// sequence number that acts like a nonce for record updates
-	//let sequence = BigInt(0);
+  // sequence number that acts like a nonce for record updates
+  // let sequence = BigInt(0);
 
-	// this is how records are signed and encoded
-	// let content = Buffer.concat([
-	// 	rlp.encode(signature),
-	// 	rpl.encode(sequence),
-	// 	rlp.encode("id"), rlp.encode(defaultKeyValuePairs.get("id")),
-	// 	rlp.encode("secp256k1"), rlp.encode(defaultKeyValuePairs.get("secp256k1")),
-	// 	rlp.encode("ip"), rlp.encode(defaultKeyValuePairs.get("ip")),
-	// 	rlp.encode("tcp"), rlp.encode(defaultKeyValuePairs.get("tcp")),
-	// 	rlp.encode("udp"), rlp.encode(defaultKeyValuePairs.get("udp"))
-	// ]);
-
-
+  // this is how records are signed and encoded
+  // let content = Buffer.concat([
+  // 	rlp.encode(signature),
+  // 	rpl.encode(sequence),
+  // 	rlp.encode("id"), rlp.encode(defaultKeyValuePairs.get("id")),
+  // 	rlp.encode("secp256k1"), rlp.encode(defaultKeyValuePairs.get("secp256k1")),
+  // 	rlp.encode("ip"), rlp.encode(defaultKeyValuePairs.get("ip")),
+  // 	rlp.encode("tcp"), rlp.encode(defaultKeyValuePairs.get("tcp")),
+  // 	rlp.encode("udp"), rlp.encode(defaultKeyValuePairs.get("udp"))
+  // ]);
 }
 
 //
@@ -123,4 +121,4 @@ class EthereumNodeRecord {
 //
 // module.exports = { EthereumNodeRecord, DefaultIdentityScheme };
 
-module.exports = EthereumNodeRecord;
+module.exports = EthereumNodeRecord
