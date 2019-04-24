@@ -4,12 +4,20 @@ const Buffer = require('safe-buffer').Buffer
 const createDebugLogger = require('debug')
 const createKeccakHash = require('keccak')
 const assert = require('assert')
-
 const debug = createDebugLogger('devp2p:util')
+
+// node discovery protocol versions
+const v4 = '4'
+const v5 = '5'
+
+// max packet size in bytes
+const MAXPACKETSIZE = 1280
 
 function keccak256 (...buffers) {
   const buffer = Buffer.concat(buffers)
-  return createKeccakHash('keccak256').update(buffer).digest()
+  return createKeccakHash('keccak256')
+    .update(buffer)
+    .digest()
 }
 
 function genPrivateKey () {
@@ -25,7 +33,7 @@ function pk2id (pk) {
 }
 
 function id2pk (id) {
-  return Buffer.concat([ Buffer.from([ 0x04 ]), id ])
+  return Buffer.concat([Buffer.from([0x04]), id])
 }
 
 function int2buffer (v) {
@@ -46,7 +54,7 @@ function zfill (buffer, size, leftpad) {
   if (buffer.length >= size) return buffer
   if (leftpad === undefined) leftpad = true
   const pad = Buffer.allocUnsafe(size - buffer.length).fill(0x00)
-  return leftpad ? Buffer.concat([ pad, buffer ]) : Buffer.concat([ buffer, pad ])
+  return leftpad ? Buffer.concat([pad, buffer]) : Buffer.concat([buffer, pad])
 }
 
 function xor (a, b) {
@@ -94,5 +102,14 @@ module.exports = {
   zfill,
   xor,
   assertEq,
-  createDeferred
+  createDeferred,
+  v4,
+  v5,
+  MAXPACKETSIZE
+}
+
+// used for v5 nonce packet. see https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md#packets
+function generateNonce () {
+  const nonce = randomBytes(16)
+  return nonce
 }

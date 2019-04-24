@@ -4,40 +4,49 @@ const Buffer = require('safe-buffer').Buffer
 const { randomBytes } = require('crypto')
 const createDebugLogger = require('debug')
 const ms = require('ms')
-const { pk2id } = require('../util')
+const { pk2id, id2pk } = require('../util')
 const KBucket = require('./kbucket')
-const BanList = require('./ban-list')
-const DPTServer = require('./server')
-
+const BanList = require('../dpt/ban-list')
+const Server = require('./server')
 const debug = createDebugLogger('devp2p:dpt')
+const chalk = require('chalk')
+const message = require('./message')
 
-class DPT extends EventEmitter {
+class DISCV5 extends EventEmitter {
   constructor (privateKey, options) {
     super()
 
     this._privateKey = Buffer.from(privateKey)
     this._id = pk2id(secp256k1.publicKeyCreate(this._privateKey, false))
 
+    // debug binary data
+    const info = id2pk(this._id)
+
+    console.log(chalk.red(`+++++ index.js == DISCV5.this._id == ${info}`))
+
     this._banlist = new BanList()
-
     this._kbucket = new KBucket(this._id)
-    this._kbucket.on('added', (peer) => this.emit('peer:added', peer))
-    this._kbucket.on('removed', (peer) => this.emit('peer:removed', peer))
-    this._kbucket.on('ping', (...args) => this._onKBucketPing(...args))
+    this._kbucket.on('added', peer => this.emit('peer:added', peer))
+    this._kbucket.on('removed', peer => this.emit('peer:removed', peer))
+    this._kbucket.on('hey', (...args) => this._onKBucketPing(...args))
 
-    this._server = new DPTServer(this, this._privateKey, {
+    this._server = new Server(this, this._privateKey, {
       createSocket: options.createSocket,
       timeout: options.timeout,
       version: options.version,
       endpoint: options.endpoint
     })
+
     this._server.once('listening', () => this.emit('listening'))
     this._server.once('close', () => this.emit('close'))
-    this._server.on('peers', (peers) => this._onServerPeers(peers))
-    this._server.on('error', (err) => this.emit('error', err))
+    this._server.on('peers', peers => this._onServerPeers(peers))
+    this._server.on('error', err => this.emit('error', err))
 
     const refreshInterval = options.refreshInterval || ms('60s')
-    this._refreshIntervalId = setInterval(() => this.refresh(), refreshInterval)
+    this._refreshIntervalId = setInterval(
+      () => this.refresh(),
+      refreshInterval
+    )
   }
 
   bind (...args) {
@@ -55,8 +64,9 @@ class DPT extends EventEmitter {
     let count = 0
     let err = null
     for (let peer of oldPeers) {
-      this._server.ping(peer)
-        .catch((_err) => {
+      this._server
+        .hey(peer)
+        .catch(_err => {
           this._banlist.add(peer, ms('5m'))
           this._kbucket.remove(peer)
           err = err || _err
@@ -78,7 +88,7 @@ class DPT extends EventEmitter {
     debug(`bootstrap with peer ${peer.address}:${peer.udpPort}`)
 
     peer = await this.addPeer(peer)
-    this._server.findneighbours(peer, this._id)
+    this._server.neighbors(peer, this._id)
   }
 
   async addPeer (obj) {
@@ -91,7 +101,7 @@ class DPT extends EventEmitter {
 
     // check that peer is alive
     try {
-      const peer = await this._server.ping(obj)
+      const peer = await this._server.hey(obj)
       this.emit('peer:new', peer)
       this._kbucket.add(peer)
       return peer
@@ -126,8 +136,8 @@ class DPT extends EventEmitter {
     const peers = this.getPeers()
     debug(`call .refresh (${peers.length} peers in table)`)
 
-    for (let peer of peers) this._server.findneighbours(peer, randomBytes(64))
+    for (let peer of peers) this._server.neighbors(peer, randomBytes(64))
   }
 }
 
-module.exports = DPT
+module.exports = DISCV5

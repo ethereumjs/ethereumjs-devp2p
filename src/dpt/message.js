@@ -1,3 +1,7 @@
+/*
+    This file implements Node Discovery Protocol Version 5 as defined here:
+    https://github.com/fjl/p2p-drafts/blob/master/discv5-packets.md
+*/
 const ip = require('ip')
 const rlp = require('rlp-encoding')
 const secp256k1 = require('secp256k1')
@@ -15,7 +19,11 @@ const timestamp = {
     return buffer
   },
   decode: function (buffer) {
-    if (buffer.length !== 4) throw new RangeError(`Invalid timestamp buffer :${buffer.toString('hex')}`)
+    if (buffer.length !== 4) {
+      throw new RangeError(
+        `Invalid timestamp buffer :${buffer.toString('hex')}`
+      )
+    }
     return buffer.readUInt32BE(0)
   }
 }
@@ -41,8 +49,8 @@ const address = {
 const port = {
   encode: function (value) {
     if (value === null) return Buffer.allocUnsafe(0)
-    if ((value >>> 16) > 0) throw new RangeError(`Invalid port: ${value}`)
-    return Buffer.from([ (value >>> 8) & 0xff, (value >>> 0) & 0xff ])
+    if (value >>> 16 > 0) throw new RangeError(`Invalid port: ${value}`)
+    return Buffer.from([(value >>> 8) & 0xff, (value >>> 0) & 0xff])
   },
   decode: function (buffer) {
     if (buffer.length === 0) return null
@@ -76,6 +84,11 @@ const ping = {
       endpoint.encode(obj.to),
       timestamp.encode(obj.timestamp)
     ]
+
+    // message = _pack(CMD_PING.id, payload, self.privkey)
+    // self.send(node, message)
+    // # Return the msg hash, which is used as a token to identify pongs.
+    //   return message[:MAC_SIZE]
   },
   decode: function (payload) {
     return {
@@ -89,11 +102,7 @@ const ping = {
 
 const pong = {
   encode: function (obj) {
-    return [
-      endpoint.encode(obj.to),
-      obj.hash,
-      timestamp.encode(obj.timestamp)
-    ]
+    return [endpoint.encode(obj.to), obj.hash, timestamp.encode(obj.timestamp)]
   },
   decode: function (payload) {
     return {
@@ -106,10 +115,7 @@ const pong = {
 
 const findneighbours = {
   encode: function (obj) {
-    return [
-      obj.id,
-      timestamp.encode(obj.timestamp)
-    ]
+    return [obj.id, timestamp.encode(obj.timestamp)]
   },
   decode: function (payload) {
     return {
@@ -122,13 +128,13 @@ const findneighbours = {
 const neighbours = {
   encode: function (obj) {
     return [
-      obj.peers.map((peer) => endpoint.encode(peer).concat(peer.id)),
+      obj.peers.map(peer => endpoint.encode(peer).concat(peer.id)),
       timestamp.encode(obj.timestamp)
     ]
   },
   decode: function (payload) {
     return {
-      peers: payload[0].map((data) => {
+      peers: payload[0].map(data => {
         return { endpoint: endpoint.decode(data), id: data[3] } // hack for id
       }),
       timestamp: timestamp.decode(payload[1])
@@ -163,13 +169,17 @@ function encode (typename, data, privateKey) {
   const type = types.byName[typename]
   if (type === undefined) throw new Error(`Invalid typename: ${typename}`)
   const encodedMsg = messages[typename].encode(data)
-  const typedata = Buffer.concat([ Buffer.from([ type ]), rlp.encode(encodedMsg) ])
+  const typedata = Buffer.concat([Buffer.from([type]), rlp.encode(encodedMsg)])
 
   const sighash = keccak256(typedata)
   const sig = secp256k1.sign(sighash, privateKey)
-  const hashdata = Buffer.concat([ sig.signature, Buffer.from([ sig.recovery ]), typedata ])
+  const hashdata = Buffer.concat([
+    sig.signature,
+    Buffer.from([sig.recovery]),
+    typedata
+  ])
   const hash = keccak256(hashdata)
-  return Buffer.concat([ hash, hashdata ])
+  return Buffer.concat([hash, hashdata])
 }
 
 function decode (buffer) {

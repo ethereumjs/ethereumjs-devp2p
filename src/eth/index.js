@@ -41,21 +41,31 @@ class ETH extends EventEmitter {
     }, ms('5s'))
   }
 
-  static eth62 = { name: 'eth', version: 62, length: 8, constructor: ETH }
-  static eth63 = { name: 'eth', version: 63, length: 17, constructor: ETH }
+  static eth62 = { name: 'eth', version: 62, length: 8, constructor: ETH };
+  static eth63 = { name: 'eth', version: 63, length: 17, constructor: ETH };
 
-  static MESSAGE_CODES = MESSAGE_CODES
+  static MESSAGE_CODES = MESSAGE_CODES;
 
   _handleMessage (code, data) {
     const payload = rlp.decode(data)
     if (code !== MESSAGE_CODES.STATUS) {
-      debug(`Received ${this.getMsgPrefix(code)} message from ${this._peer._socket.remoteAddress}:${this._peer._socket.remotePort}: ${data.toString('hex')}`)
+      debug(
+        `Received ${this.getMsgPrefix(code)} message from ${
+          this._peer._socket.remoteAddress
+        }:${this._peer._socket.remotePort}: ${data.toString('hex')}`
+      )
     }
     switch (code) {
       case MESSAGE_CODES.STATUS:
         assertEq(this._peerStatus, null, 'Uncontrolled status message')
         this._peerStatus = payload
-        debug(`Received ${this.getMsgPrefix(code)} message from ${this._peer._socket.remoteAddress}:${this._peer._socket.remotePort}: : ${this._getStatusString(this._peerStatus)}`)
+        debug(
+          `Received ${this.getMsgPrefix(code)} message from ${
+            this._peer._socket.remoteAddress
+          }:${this._peer._socket.remotePort}: : ${this._getStatusString(
+            this._peerStatus
+          )}`
+        )
         this._handleStatus()
         break
 
@@ -104,8 +114,12 @@ class ETH extends EventEmitter {
   }
 
   _getStatusString (status) {
-    var sStr = `[V:${buffer2int(status[0])}, NID:${buffer2int(status[1])}, TD:${buffer2int(status[2])}`
-    sStr += `, BestH:${status[3].toString('hex')}, GenH:${status[4].toString('hex')}]`
+    var sStr = `[V:${buffer2int(status[0])}, NID:${buffer2int(
+      status[1]
+    )}, TD:${buffer2int(status[2])}`
+    sStr += `, BestH:${status[3].toString('hex')}, GenH:${status[4].toString(
+      'hex'
+    )}]`
     return sStr
   }
 
@@ -119,13 +133,23 @@ class ETH extends EventEmitter {
       status.genesisHash
     ]
 
-    debug(`Send STATUS message to ${this._peer._socket.remoteAddress}:${this._peer._socket.remotePort} (eth${this._version}): ${this._getStatusString(this._status)}`)
+    debug(
+      `Send STATUS message to ${this._peer._socket.remoteAddress}:${
+        this._peer._socket.remotePort
+      } (eth${this._version}): ${this._getStatusString(this._status)}`
+    )
     this._send(MESSAGE_CODES.STATUS, rlp.encode(this._status))
     this._handleStatus()
   }
 
   sendMessage (code, payload) {
-    debug(`Send ${this.getMsgPrefix(code)} message to ${this._peer._socket.remoteAddress}:${this._peer._socket.remotePort}: ${rlp.encode(payload).toString('hex')}`)
+    debug(
+      `Send ${this.getMsgPrefix(code)} message to ${
+        this._peer._socket.remoteAddress
+      }:${this._peer._socket.remotePort}: ${rlp
+        .encode(payload)
+        .toString('hex')}`
+    )
     switch (code) {
       case MESSAGE_CODES.STATUS:
         throw new Error('Please send status message through .sendStatus')
@@ -138,14 +162,18 @@ class ETH extends EventEmitter {
       case MESSAGE_CODES.BLOCK_BODIES:
       case MESSAGE_CODES.NEW_BLOCK:
         if (this._version >= ETH.eth62.version) break
-        throw new Error(`Code ${code} not allowed with version ${this._version}`)
+        throw new Error(
+          `Code ${code} not allowed with version ${this._version}`
+        )
 
       case MESSAGE_CODES.GET_NODE_DATA:
       case MESSAGE_CODES.NODE_DATA:
       case MESSAGE_CODES.GET_RECEIPTS:
       case MESSAGE_CODES.RECEIPTS:
         if (this._version >= ETH.eth63.version) break
-        throw new Error(`Code ${code} not allowed with version ${this._version}`)
+        throw new Error(
+          `Code ${code} not allowed with version ${this._version}`
+        )
 
       default:
         throw new Error(`Unknown code ${code}`)
@@ -155,7 +183,9 @@ class ETH extends EventEmitter {
   }
 
   getMsgPrefix (msgCode) {
-    return Object.keys(MESSAGE_CODES).find(key => MESSAGE_CODES[key] === msgCode)
+    return Object.keys(MESSAGE_CODES).find(
+      key => MESSAGE_CODES[key] === msgCode
+    )
   }
 }
 

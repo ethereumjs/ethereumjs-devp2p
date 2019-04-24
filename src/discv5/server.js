@@ -13,7 +13,6 @@ const createSocketUDP4 = dgram.createSocket.bind(null, 'udp4')
 class Server extends EventEmitter {
   constructor (dpt, privateKey, options) {
     super()
-
     this._dpt = dpt
     this._privateKey = privateKey
 
@@ -30,6 +29,7 @@ class Server extends EventEmitter {
     )
 
     this._timeout = options.timeout || ms('10s')
+
     this._endpoint = options.endpoint || {
       address: '0.0.0.0',
       udpPort: null,
@@ -49,6 +49,7 @@ class Server extends EventEmitter {
     this._socket.once('close', () => this.emit('close'))
     this._socket.on('error', err => this.emit('error', err))
 
+    // processes incoming messages
     this._socket.on('message', (msg, rinfo) => {
       try {
         this._handler(msg, rinfo)
@@ -73,14 +74,14 @@ class Server extends EventEmitter {
     this._socket = null
   }
 
-  async ping (peer) {
+  async hey (peer) {
     this._isAliveCheck()
 
     const rckey = `${peer.address}:${peer.udpPort}`
     const promise = this._requestsCache.get(rckey)
     if (promise !== undefined) return promise
 
-    const hash = this._send(peer, 'ping', {
+    const hash = this._send(peer, 'hey', {
       version: this._version,
       from: this._endpoint,
       to: peer
@@ -112,9 +113,9 @@ class Server extends EventEmitter {
     return deferred.promise
   }
 
-  findneighbours (peer, id) {
+  neighbors (peer, id) {
     this._isAliveCheck()
-    this._send(peer, 'findneighbours', { id })
+    this._send(peer, 'neighbors', { id })
   }
 
   _isAliveCheck () {
@@ -122,10 +123,10 @@ class Server extends EventEmitter {
   }
 
   _send (peer, typename, data) {
-    debug(
-      `send ${typename} to ${peer.address}:${peer.udpPort} (peerId: ${peer.id &&
-        peer.id.toString('hex')})`
-    )
+    // debug(
+    //   `send ${typename} to ${peer.address}:${peer.udpPort} (peerId: ${peer.id &&
+    //     peer.id.toString("hex")})`
+    // );
 
     const msg = message.encode(typename, data, this._privateKey)
     // Parity hack
@@ -133,7 +134,7 @@ class Server extends EventEmitter {
     // discovery spec (hash: sha3(signature || packet-type || packet-data))
     // but just hashing the RLP-encoded packet data (see discovery.rs, on_ping())
     // 2018-02-28
-    if (typename === 'ping') {
+    if (typename === 'hey') {
       const rkeyParity = keccak256(msg.slice(98)).toString('hex')
       this._parityRequestMap.set(rkeyParity, msg.slice(0, 32).toString('hex'))
       setTimeout(() => {
@@ -142,13 +143,16 @@ class Server extends EventEmitter {
         }
       }, this._timeout)
     }
+
     this._socket.send(msg, 0, msg.length, peer.udpPort, peer.address)
     return msg.slice(0, 32) // message id
   }
 
+  // processes each incoming message by it's message type, msg in binary data
   _handler (msg, rinfo) {
     const info = message.decode(msg)
     const peerId = pk2id(info.publicKey)
+
     debug(
       `received ${info.typename} from ${rinfo.address}:${
         rinfo.port
@@ -159,16 +163,16 @@ class Server extends EventEmitter {
     const peer = this._dpt.getPeer(peerId)
     if (
       peer === null &&
-      info.typename === 'ping' &&
+      info.typename === 'hey' &&
       info.data.from.udpPort !== null
     ) {
       setTimeout(() => this.emit('peers', [info.data.from]), ms('100ms'))
     }
 
     switch (info.typename) {
-      case 'ping':
+      case 'hey':
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
-        this._send(rinfo, 'pong', {
+        this._send(rinfo, 'hey', {
           to: {
             address: rinfo.address,
             udpPort: rinfo.port,
@@ -178,14 +182,21 @@ class Server extends EventEmitter {
         })
         break
 
-      case 'pong':
+      /*
+          findNode packet (0x03)
+          requests a neighbors packet containing the closest know nodes to the target hash.
+      */
+      case 'findNode':
+
         var rkey = info.data.hash.toString('hex')
         const rkeyParity = this._parityRequestMap.get(rkey)
+
         if (rkeyParity) {
           rkey = rkeyParity
           this._parityRequestMap.delete(rkeyParity)
         }
         const request = this._requests.get(rkey)
+
         if (request) {
           this._requests.delete(rkey)
           request.deferred.resolve({
@@ -197,15 +208,71 @@ class Server extends EventEmitter {
         }
         break
 
-      case 'findneighbours':
+      case 'neighbors':
         Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
-        this._send(rinfo, 'neighbours', {
+        this._send(rinfo, 'neighbors', {
           peers: this._dpt.getClosestPeers(info.data.id)
         })
         break
 
-      case 'neighbours':
-        this.emit('peers', info.data.peers.map(peer => peer.endpoint))
+      case 'requestTicket':
+        Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
+        this._send(rinfo, 'pong', {
+          to: {
+            address: rinfo.address,
+            udpPort: rinfo.port,
+            tcpPort: info.data.from.tcpPort
+          },
+          hash: msg.slice(0, 32)
+        })
+        break
+
+      case 'ticket':
+        Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
+        this._send(rinfo, 'pong', {
+          to: {
+            address: rinfo.address,
+            udpPort: rinfo.port,
+            tcpPort: info.data.from.tcpPort
+          },
+          hash: msg.slice(0, 32)
+        })
+        break
+
+      case 'topicRegister':
+        Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
+        this._send(rinfo, 'pong', {
+          to: {
+            address: rinfo.address,
+            udpPort: rinfo.port,
+            tcpPort: info.data.from.tcpPort
+          },
+          hash: msg.slice(0, 32)
+        })
+        break
+
+      case 'topicQuery':
+        Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
+        this._send(rinfo, 'pong', {
+          to: {
+            address: rinfo.address,
+            udpPort: rinfo.port,
+            tcpPort: info.data.from.tcpPort
+          },
+          hash: msg.slice(0, 32)
+        })
+        break
+
+      case 'topicNodes':
+        Object.assign(rinfo, { id: peerId, udpPort: rinfo.port })
+        this._send(rinfo, 'pong', {
+          to: {
+            address: rinfo.address,
+            udpPort: rinfo.port,
+            tcpPort: info.data.from.tcpPort
+          },
+          hash: msg.slice(0, 32)
+        })
         break
     }
   }
