@@ -15,9 +15,8 @@ export class KBucket extends EventEmitter {
   _kbucket: _KBucket
   constructor(id: string | Buffer) {
     super()
-
     this._kbucket = new _KBucket({
-      localNodeId: id,
+      localNodeId: typeof id === 'string' ? Buffer.from(id) : id,
       numberOfNodesPerKBucket: KBUCKET_SIZE,
       numberOfNodesToPing: KBUCKET_CONCURRENCY,
     })
@@ -63,8 +62,8 @@ export class KBucket extends EventEmitter {
     return this._kbucket.toArray()
   }
 
-  closest(id: string): any {
-    return this._kbucket.closest(id, KBUCKET_SIZE)
+  closest(id: string) {
+    return this._kbucket.closest(Buffer.from(id), KBUCKET_SIZE)
   }
 
   remove(obj: Buffer | string | KObj) {
