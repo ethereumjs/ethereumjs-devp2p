@@ -22,6 +22,7 @@ export interface RLPxOptions {
   remoteClientIdFilter?: string[]
   capabilities: Capabilities[]
   listenPort: number | null
+  connectPort?: number | undefined
 }
 
 export class RLPx extends EventEmitter {
@@ -33,6 +34,7 @@ export class RLPx extends EventEmitter {
   _remoteClientIdFilter?: string[]
   _capabilities: Capabilities[]
   _listenPort: number | null
+  _connectPort: number | undefined
   _dpt: DPT
   _peersLRU: LRUCache<string, boolean>
   _peersQueue: { peer: PeerInfo; ts: number }[]
@@ -57,6 +59,7 @@ export class RLPx extends EventEmitter {
     this._remoteClientIdFilter = options.remoteClientIdFilter
     this._capabilities = options.capabilities
     this._listenPort = options.listenPort
+    this._connectPort = options.connectPort
 
     // DPT
     this._dpt = options.dpt || null
@@ -134,7 +137,15 @@ export class RLPx extends EventEmitter {
 
     socket.once('error', deferred.reject)
     socket.setTimeout(this._timeout, () => deferred.reject(new Error('Connection timeout')))
-    socket.connect(peer.tcpPort, peer.address, deferred.resolve)
+    socket.connect(
+      {
+        port: peer.tcpPort,
+        host: peer.address,
+        // use the connectionPort to connect from
+        localPort: this._connectPort,
+      },
+      deferred.resolve,
+    )
 
     await deferred.promise
     this._onConnect(socket, peer.id)
