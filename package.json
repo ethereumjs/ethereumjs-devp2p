@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.11.6",
-    "bl": "^1.1.2",
+    "bl": "^4.0.3",
     "debug": "^2.2.0",
     "inherits": "^2.0.1",
     "ip": "^1.1.3",
