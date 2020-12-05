@@ -182,6 +182,7 @@ Creates new RLPx object
 - `options.remoteClientIdFilter` - Optional list of client ID filter strings (e.g. `['go1.5', 'quorum']`).
 - `options.capabilities` - Upper layer protocol capabilities, e.g. `[devp2p.ETH.eth63, devp2p.ETH.eth62]`.
 - `options.listenPort` - The listening port for the server or `null` for default.
+- `options.connectPort` - The default local connection port to connect with remote peers with: if `undefined`, connect from a random local port.
 - `options.dpt` - `DPT` object for the peers to connect to (default: `null`, no `DPT` peer management).
 
 #### `rlpx.connect(peer)` (`async`)
